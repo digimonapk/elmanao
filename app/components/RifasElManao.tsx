@@ -20,6 +20,7 @@ export default function RifasElManao() {
   const [selectedQuantity, setSelectedQuantity] = useState(5);
   const [customQuantity, setCustomQuantity] = useState(5);
   const [selectedPayment, setSelectedPayment] = useState("");
+  const [qtyInput, setQtyInput] = useState<string>(String(customQuantity));
 
   const [loading, setLoading] = useState(false);
 
@@ -458,25 +459,59 @@ export default function RifasElManao() {
                     </div>
 
                     {/* Cantidad centrada */}
-                    <div className="text-center text-sm font-black text-slate-900">
-                      {customQuantity}
-                    </div>
-
                     <div className="border-t border-slate-200" />
 
-                    {/* Botones - + como la foto */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3 items-center">
                       <button
                         className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
-                        onClick={() =>
-                          setCustomQuantity((q) => Math.max(5, q - 1))
-                        }
+                        onClick={() => {
+                          const next = Math.max(
+                            5,
+                            (Number(customQuantity) || 5) - 1
+                          );
+                          setCustomQuantity(next);
+                          setQtyInput(String(next));
+                        }}
+                        aria-label="Disminuir"
                       >
                         −
                       </button>
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={qtyInput}
+                        onChange={(e) => {
+                          // ✅ deja escribir libre, solo filtra a dígitos
+                          const v = e.target.value.replace(/[^\d]/g, "");
+                          setQtyInput(v);
+                        }}
+                        onBlur={() => {
+                          // ✅ aquí recién validas
+                          const n = parseInt(qtyInput || "", 10);
+
+                          if (!Number.isFinite(n)) {
+                            setCustomQuantity(5);
+                            setQtyInput("5");
+                            return;
+                          }
+
+                          const fixed = Math.max(5, n);
+                          setCustomQuantity(fixed);
+                          setQtyInput(String(fixed));
+                        }}
+                        className="h-12 w-full rounded-xl border border-slate-200 bg-white text-center text-lg font-black text-slate-900 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200"
+                        placeholder="5+"
+                      />
+
                       <button
                         className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
-                        onClick={() => setCustomQuantity((q) => q + 1)}
+                        onClick={() => {
+                          const next = (Number(customQuantity) || 5) + 1;
+                          setCustomQuantity(next);
+                          setQtyInput(String(next));
+                        }}
+                        aria-label="Aumentar"
                       >
                         +
                       </button>
