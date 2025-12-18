@@ -21,7 +21,7 @@ const MONGODB_DB_NAME = "raffle_db";
 const MONGODB_COLLECTION = "tickets2";
 
 // ✅ base URL para QR/link
-const BASE_URL = "http://localhost:3000"; // cambia a https://ganaconivan.shop
+const BASE_URL = "https://elmanao.vercel.app/"; // cambia a https://ganaconivan.shop
 
 let cachedClient: MongoClient | null = null;
 
