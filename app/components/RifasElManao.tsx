@@ -196,22 +196,65 @@ export default function RifasElManao() {
 
   // ✅ 2) Reportar pago con FormData (archivo)
   async function reportPayment() {
-    if (!reportData.reference.trim())
-      return alert("Ingresa el número de referencia.");
-    if (!reportData.phone.trim()) return alert("Ingresa el teléfono emisor.");
-    if (!reportData.proofFile) return alert("Ingresa tu comprobante de pago.");
+    // ✅ Snapshot de states (evita valores “a veces vacíos” por updates async)
+    const fullName = (userData.fullName || "").trim();
+    const userCountryCode = String(userData.cedula || "")
+      .trim()
+      .toUpperCase();
+    const userIdNumber = String(userData.cedulaNumber || "")
+      .trim()
+      .replace(/\D/g, ""); // solo números
+
+    const userPhone = (userData.phone || "").trim();
+    const email = (userData.email || "").trim();
+    const paymentMethod = (selectedPayment || "").trim();
+
+    const referenceNumber = (reportData.reference || "").trim();
+    const emitterPhone = `${reportData.phonePrefix || ""}${(
+      reportData.phone || ""
+    ).trim()}`;
+    const proofFile = reportData.proofFile;
+
+    // ✅ Validaciones (usuario)
+    if (!fullName) return alert("Ingresa tu nombre completo.");
+    if (!email) return alert("Ingresa tu correo.");
+    if (!paymentMethod) return alert("Selecciona el método de pago.");
+
+    if (!["V", "E", "J", "G"].includes(userCountryCode)) {
+      return alert("Selecciona un tipo de documento válido (V/E/J/G).");
+    }
+
+    if (!userIdNumber) {
+      return alert("Ingresa tu número de cédula (solo números).");
+    }
+
+    // ✅ Validaciones (reporte)
+    if (!referenceNumber) return alert("Ingresa el número de referencia.");
+    if (!emitterPhone.replace(/\D/g, ""))
+      return alert("Ingresa el teléfono emisor.");
+    if (!proofFile) return alert("Ingresa tu comprobante de pago.");
+
+    // (opcional pero recomendado) validar tipo de archivo
+    if (proofFile instanceof File && proofFile.size === 0) {
+      return alert(
+        "El archivo del comprobante está vacío. Vuelve a adjuntarlo."
+      );
+    }
+    if (proofFile instanceof File && !proofFile.type.startsWith("image/")) {
+      return alert("El comprobante debe ser una imagen (jpg/png/webp).");
+    }
 
     setLoading(true);
     try {
       const fd = new FormData();
 
       // ✅ Datos usuario (comprador)
-      fd.append("fullName", userData.fullName.trim());
-      fd.append("userCountryCode", userData.cedula);
-      fd.append("userIdNumber", userData.cedulaNumber.trim());
-      fd.append("userPhone", userData.phone.trim());
-      fd.append("email", userData.email.trim());
-      fd.append("paymentMethod", selectedPayment);
+      fd.append("fullName", fullName);
+      fd.append("userCountryCode", userCountryCode);
+      fd.append("userIdNumber", userIdNumber);
+      fd.append("userPhone", userPhone);
+      fd.append("email", email);
+      fd.append("paymentMethod", paymentMethod);
 
       // ✅ Datos compra
       fd.append("quantity", String(customQuantity));
@@ -219,35 +262,42 @@ export default function RifasElManao() {
       fd.append("ticketPrice", String(currentRaffle.price));
 
       // ✅ Datos pago (reporte)
-      fd.append("bank", "0102 (Banco de Venezuela)"); // 👈 si lo quieres dinámico, lo pasamos a state
-      fd.append("referenceNumber", reportData.reference.trim());
-
-      // opcional: guardar teléfono emisor (si tu backend lo acepta)
-      fd.append(
-        "emitterPhone",
-        `${reportData.phonePrefix}${reportData.phone.trim()}`
-      );
+      fd.append("bank", "0102 (Banco de Venezuela)");
+      fd.append("referenceNumber", referenceNumber);
+      fd.append("emitterPhone", emitterPhone);
 
       // ✅ Comprobante
-      fd.append("proofFile", reportData.proofFile);
+      // Nota: FormData.append acepta Blob/File. Si por alguna razón llega null, ya lo frenamos arriba.
+      fd.append(
+        "proofFile",
+        proofFile instanceof File ? proofFile : (proofFile as any)
+      );
 
       const res = await fetch("/api/payment-report", {
         method: "POST",
         body: fd,
       });
 
-      const json = await res.json();
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch {
+        // si el server devolvió HTML o vacío
+      }
 
       if (!res.ok || !json?.ok) {
-        alert(json?.error ?? "Falló el reporte de pago.");
+        const msg =
+          json?.error || `Falló el reporte de pago (HTTP ${res.status}).`;
+        alert(msg);
         return;
       }
 
       // ✅ tickets reales del backend
       const tickets = (json.tickets || []).map((t: any) => String(t));
       setGeneratedTickets(tickets);
-
       setStep("TICKETS");
+    } catch (e: any) {
+      alert(e?.message || "Error de red al enviar el reporte.");
     } finally {
       setLoading(false);
     }
@@ -369,9 +419,9 @@ export default function RifasElManao() {
 
                   {/* ✅ En celular: 3 columnas como la imagen */}
                   <div className="grid grid-cols-3 gap-3">
-                    {[2, 5, 10, 20, 30, 50].map((qty) => {
+                    {[5, 10, 20, 30, 50, 100].map((qty) => {
                       const selected = customQuantity === qty;
-                      const popular = qty === 5;
+                      const popular = qty === 10;
 
                       return (
                         <button
@@ -417,7 +467,7 @@ export default function RifasElManao() {
                     <button
                       className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
                       onClick={() =>
-                        setCustomQuantity((q) => Math.max(1, q - 1))
+                        setCustomQuantity((q) => Math.max(5, q - 1))
                       }
                     >
                       −
@@ -749,7 +799,7 @@ export default function RifasElManao() {
                 Pago móvil
               </div>
               <div className="mt-1 text-xs font-semibold text-slate-500">
-                Mínimo 2 boletos
+                Mínimo 5 boletos
               </div>
             </button>
 

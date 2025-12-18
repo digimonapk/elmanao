@@ -358,12 +358,23 @@ export async function POST(request: NextRequest) {
 
     // ✅ Datos del usuario + compra
     const fullName = String(formData.get("fullName") || "").trim();
-    const userCountryCode = String(formData.get("userCountryCode") || "")
+    const rawCountry =
+      formData.get("userCountryCode") ??
+      formData.get("countryCode") ??
+      formData.get("idCountryCode");
+
+    const userCountryCode = String(rawCountry || "")
       .trim()
       .toUpperCase();
-    const userIdNumber = String(formData.get("userIdNumber") || "")
+    const rawId =
+      formData.get("userIdNumber") ??
+      formData.get("idNumber") ??
+      formData.get("id_number");
+
+    const userIdNumber = String(rawId || "")
       .trim()
-      .replace(/\D/g, ""); // solo números
+      .replace(/\D/g, "");
+
     const userPhone = String(formData.get("userPhone") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const paymentMethod = String(formData.get("paymentMethod") || "").trim();
