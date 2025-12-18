@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Modal } from "./ui/Modal";
+import { Copy, Check } from "lucide-react";
+
 import {
   Input,
   Label,
@@ -44,6 +46,18 @@ export default function RifasElManao() {
   const [generatedTickets, setGeneratedTickets] = useState<string[]>([]);
 
   const [timeLeft, setTimeLeft] = useState({ days: 12, hours: 22, minutes: 0 });
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  async function copyWithFeedback(key: string, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1200);
+    } catch {
+      // fallback básico si clipboard falla
+      alert("No se pudo copiar. Copia manualmente.");
+    }
+  }
 
   const currentRaffle = useMemo(
     () => ({
@@ -289,7 +303,7 @@ export default function RifasElManao() {
             />
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-xl">
+          <div className="rounded-2xl bg-white p-4 sm:p-6 shadow-xl">
             <h1 className="mb-4 text-2xl font-black text-slate-900">
               {currentRaffle.title} <span>🔥</span>
             </h1>
@@ -339,9 +353,24 @@ export default function RifasElManao() {
               {/* ✅ Si estás en BUY, muestra el selector inline */}
               {step === "BUY" && (
                 <div className="mt-2 space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* Header BUY como la foto */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-black text-slate-900">
+                      Comprar boletos
+                    </div>
+                    <button
+                      className="h-9 w-9 rounded-full border border-slate-200 bg-white font-black text-slate-700 hover:bg-slate-50"
+                      onClick={() => setStep("NONE")}
+                      aria-label="Cerrar"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* ✅ En celular: 3 columnas como la imagen */}
+                  <div className="grid grid-cols-3 gap-3">
                     {[2, 5, 10, 20, 30, 50].map((qty) => {
-                      const selected = selectedQuantity === qty;
+                      const selected = customQuantity === qty;
                       const popular = qty === 5;
 
                       return (
@@ -351,31 +380,42 @@ export default function RifasElManao() {
                             setSelectedQuantity(qty);
                             setCustomQuantity(qty);
                           }}
-                          className={`relative rounded-xl border-2 p-6 text-center text-3xl font-black transition
-                ${
-                  selected
-                    ? "border-yellow-400 bg-yellow-50"
-                    : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
-                }`}
+                          className={`relative rounded-xl border p-4 text-center text-2xl font-black transition
+              ${
+                selected
+                  ? "border-slate-300 bg-slate-200 text-slate-900"
+                  : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
+              }`}
                         >
                           {qty}
+
                           {popular && (
-                            <span className="absolute left-1/2 -translate-x-1/2 bottom-3 text-[11px] font-black text-yellow-600">
+                            <div className="mt-1 text-[10px] font-black text-yellow-600">
                               Más popular
-                            </span>
+                            </div>
+                          )}
+
+                          {selected && (
+                            <div className="mt-1 text-[10px] font-black text-slate-700">
+                              Seleccionado
+                            </div>
                           )}
                         </button>
                       );
                     })}
                   </div>
 
+                  {/* Cantidad centrada */}
                   <div className="text-center text-sm font-black text-slate-900">
                     {customQuantity}
                   </div>
 
+                  <div className="border-t border-slate-200" />
+
+                  {/* Botones - + como la foto */}
                   <div className="grid grid-cols-2 gap-3">
                     <button
-                      className="h-12 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
+                      className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
                       onClick={() =>
                         setCustomQuantity((q) => Math.max(1, q - 1))
                       }
@@ -383,14 +423,14 @@ export default function RifasElManao() {
                       −
                     </button>
                     <button
-                      className="h-12 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
+                      className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
                       onClick={() => setCustomQuantity((q) => q + 1)}
                     >
                       +
                     </button>
                   </div>
 
-                  {/* ✅ Pagar abre el overlay */}
+                  {/* Pagar */}
                   <button
                     className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 hover:bg-yellow-500 transition"
                     onClick={() => setStep("PAY")}
@@ -398,15 +438,15 @@ export default function RifasElManao() {
                     Pagar Bs. {total.toFixed(2)}
                   </button>
 
+                  {/* Limpiar todo */}
                   <button
-                    className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
                     onClick={() => {
                       setSelectedQuantity(2);
                       setCustomQuantity(2);
-                      setStep("NONE"); // ✅ vuelve a mostrar los 2 botones
                     }}
                   >
-                    Cancelar
+                    Limpiar todo
                   </button>
                 </div>
               )}
@@ -645,108 +685,135 @@ export default function RifasElManao() {
         onClose={() => setStep("NONE")}
         maxWidthClass="max-w-xl"
       >
-        <div className="space-y-4">
-          <div className="rounded-xl bg-slate-50 p-4">
-            <div className="flex justify-between text-sm font-bold text-slate-600">
-              <span>Precio por boleto</span>
-              <span className="text-slate-900">
+        <div className="space-y-6">
+          {/* Resumen (como la foto: limpio, con separadores) */}
+          <div className="space-y-3">
+            <div className="flex items-start justify-between text-sm">
+              <div className="text-slate-500 leading-tight">
+                Precio por <br /> boleto
+              </div>
+              <div className="font-semibold text-slate-900">
                 Bs. {currentRaffle.price.toFixed(2)}
-              </span>
+              </div>
             </div>
-            <div className="mt-2 flex justify-between text-sm font-bold text-slate-600">
-              <span>Cantidad</span>
-              <span className="text-slate-900">{customQuantity}</span>
+
+            <div className="flex items-start justify-between text-sm">
+              <div className="text-slate-500 leading-tight">
+                Cantidad de <br /> boletos
+              </div>
+              <div className="font-semibold text-slate-900">
+                {customQuantity}
+              </div>
             </div>
-            <div className="mt-3 border-t pt-3 flex justify-between text-sm font-black">
-              <span>Total</span>
-              <span>Bs. {total.toFixed(2)}</span>
+
+            <div className="border-t border-slate-200 pt-3 flex items-center justify-between text-sm">
+              <div className="text-slate-500">Total a pagar</div>
+              <div className="font-semibold text-slate-900">
+                Bs. {total.toFixed(2)}
+              </div>
             </div>
           </div>
 
+          {/* Título sección */}
+          <div className="text-sm font-black text-slate-900">
+            Elige el método de pago para continuar
+          </div>
+
+          {/* Métodos en L con más aire */}
           <div className="grid grid-cols-2 gap-4">
             {/* PAGO MÓVIL (ACTIVO) */}
             <button
+              type="button"
               onClick={() => setSelectedPayment("pago-movil")}
-              className={`relative rounded-xl border-2 p-4 text-left transition flex items-center gap-3
-      ${
-        selectedPayment === "pago-movil"
-          ? "border-yellow-400 bg-yellow-50"
-          : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
-      }`}
+              className={`relative rounded-xl border p-5 text-left transition bg-white
+          ${
+            selectedPayment === "pago-movil"
+              ? "border-yellow-400"
+              : "border-slate-200 hover:border-yellow-400"
+          }`}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-400 text-lg font-black">
-                📱
-              </div>
-
-              <div className="flex-1">
-                <div className="text-sm font-black text-slate-900">
-                  Pago móvil
-                </div>
-                <div className="text-xs font-bold text-slate-500">
-                  Mínimo 2 boletos
-                </div>
-              </div>
-
-              <div
-                className={`h-5 w-5 rounded-full border-2
-        ${
-          selectedPayment === "pago-movil"
-            ? "border-yellow-400 bg-yellow-400"
-            : "border-slate-300"
-        }`}
+              {/* radio arriba derecha */}
+              <span
+                className={`absolute right-4 top-4 h-4 w-4 rounded-full border-2
+            ${
+              selectedPayment === "pago-movil"
+                ? "border-yellow-400 bg-yellow-400"
+                : "border-yellow-400"
+            }`}
               />
+
+              {/* icono simple como la foto */}
+              <div className="text-yellow-500 text-2xl leading-none">📱</div>
+
+              <div className="mt-3 text-sm font-black text-slate-900">
+                Pago móvil
+              </div>
+              <div className="mt-1 text-xs font-semibold text-slate-500">
+                Mínimo 2 boletos
+              </div>
             </button>
 
-            {/* BINANCE PAY (DESHABILITADO) */}
-            <div className="relative rounded-xl border-2 border-slate-200 bg-slate-50 p-4 flex items-center gap-3 opacity-60 cursor-not-allowed">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-300 text-lg font-black">
-                ₿
-              </div>
+            {/* BINANCE PAY (INHABILITADO) */}
+            <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60">
+              <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
 
-              <div className="flex-1">
-                <div className="text-sm font-black text-slate-600">
-                  Binance Pay
-                </div>
-                <div className="text-xs font-bold text-slate-400">
-                  Mínimo 40 boletos
-                </div>
-              </div>
+              <div className="text-yellow-500 text-2xl leading-none">🔸</div>
 
-              <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
+              <div className="mt-3 text-sm font-black text-slate-900">
+                Binance Pay
+              </div>
+              <div className="mt-1 text-xs font-semibold text-slate-500">
+                Mínimo 40 boletos
+              </div>
             </div>
 
-            {/* ZELLE (DESHABILITADO, ABAJO IZQUIERDA) */}
-            <div className="relative rounded-xl border-2 border-slate-200 bg-slate-50 p-4 flex items-center gap-3 opacity-60 cursor-not-allowed col-span-1">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-300 text-lg font-black">
-                $
-              </div>
+            {/* ZELLE (INHABILITADO) abajo izquierda */}
+            <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60 col-span-1">
+              <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
 
-              <div className="flex-1">
-                <div className="text-sm font-black text-slate-600">Zelle</div>
-                <div className="text-xs font-bold text-slate-400">
-                  Mínimo 40 boletos
-                </div>
-              </div>
+              <div className="text-yellow-500 text-2xl leading-none">⚡</div>
 
-              <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
+              <div className="mt-3 text-sm font-black text-slate-900">
+                Zelle
+              </div>
+              <div className="mt-1 text-xs font-semibold text-slate-500">
+                Mínimo 40 boletos
+              </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-xs font-bold text-yellow-900">
-            Al continuar aceptas Términos y condiciones.
+          {/* T&C como la foto (texto, link) */}
+          <div className="pt-2 text-center text-xs font-semibold text-slate-600">
+            Al presionar "Continuar" declaras haber leído y aceptado nuestros{" "}
+            <a className="text-blue-600 font-black underline" href="#">
+              Términos y condiciones
+            </a>
+            .
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <SecondaryButton full onClick={() => setStep("BUY")}>
-              Volver
-            </SecondaryButton>
-            <PrimaryButton
-              full
+          {/* Botones abajo con aire */}
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <button
+              type="button"
+              className="h-12 rounded-xl border border-slate-200 bg-white text-sm font-black text-slate-900 hover:bg-slate-50 transition"
+              onClick={() => setStep("BUY")}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              className={`h-12 rounded-xl text-sm font-black transition
+          ${
+            selectedPayment
+              ? "bg-yellow-400 text-slate-900 hover:bg-yellow-500"
+              : "bg-yellow-200 text-slate-500 cursor-not-allowed"
+          }`}
               onClick={() => setStep("USER")}
               disabled={!selectedPayment}
             >
               Continuar
-            </PrimaryButton>
+            </button>
           </div>
         </div>
       </Modal>
@@ -874,10 +941,23 @@ export default function RifasElManao() {
                 Bs. {total.toFixed(2)}
               </div>
               <button
-                className="rounded-xl bg-yellow-400 px-3 py-2 text-xs font-black"
-                onClick={() => navigator.clipboard.writeText(total.toFixed(2))}
+                className="h-10 w-10 rounded-xl bg-yellow-400 flex items-center justify-center hover:bg-yellow-500 transition"
+                onClick={() => copyWithFeedback("amount", total.toFixed(2))}
+                aria-label="Copiar monto"
               >
-                Copiar
+                <span
+                  className={`transition-all duration-200 ${
+                    copiedKey === "amount"
+                      ? "scale-110 opacity-100"
+                      : "scale-100 opacity-100"
+                  }`}
+                >
+                  {copiedKey === "amount" ? (
+                    <Check className="h-5 w-5 text-slate-900 animate-[pop_180ms_ease-out]" />
+                  ) : (
+                    <Copy className="h-5 w-5 text-slate-900" />
+                  )}
+                </span>
               </button>
             </div>
           </div>
@@ -901,10 +981,17 @@ export default function RifasElManao() {
                     {row.value}
                   </div>
                   <button
-                    className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-black"
-                    onClick={() => navigator.clipboard.writeText(row.value)}
+                    className="h-8 w-8 rounded-lg bg-slate-200 flex items-center justify-center hover:bg-slate-300 transition"
+                    onClick={() =>
+                      copyWithFeedback(`row-${row.label}`, row.value)
+                    }
+                    aria-label={`Copiar ${row.label}`}
                   >
-                    Copiar
+                    {copiedKey === `row-${row.label}` ? (
+                      <Check className="h-4 w-4 text-slate-700 animate-[pop_180ms_ease-out]" />
+                    ) : (
+                      <Copy className="h-4 w-4 text-slate-700" />
+                    )}
                   </button>
                 </div>
               </div>

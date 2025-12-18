@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 export function Modal({
   open,
@@ -17,27 +17,51 @@ export function Modal({
 }) {
   if (!open) return null;
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-      onClick={onClose}
-    >
-      <div
-        className={`w-full ${maxWidthClass} max-h-[90vh] overflow-auto rounded-2xl bg-white shadow-2xl`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b px-5 py-4">
-          <h3 className="text-base font-black text-slate-900">{title}</h3>
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 hover:bg-slate-100"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
+  // ✅ Cerrar con ESC
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
-        <div className="p-5">{children}</div>
+  return (
+    <div className="fixed inset-0 z-50">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <div className="absolute inset-0 flex items-end sm:items-center sm:justify-center">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`
+            w-full bg-white shadow-2xl
+            h-[100dvh] sm:h-auto
+            rounded-none sm:rounded-2xl
+            ${maxWidthClass} sm:mx-4
+            flex flex-col
+          `}
+        >
+          {/* Header */}
+          <div className="sticky top-0 z-10 bg-white border-b px-5 py-4 flex items-center justify-between">
+            <h3 className="text-base font-black text-slate-900">{title}</h3>
+            <button
+              onClick={onClose}
+              className="h-10 w-10 rounded-full hover:bg-slate-100 flex items-center justify-center"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Body (scroll) */}
+          <div className="flex-1 overflow-auto px-5 py-5">{children}</div>
+        </div>
       </div>
     </div>
   );
