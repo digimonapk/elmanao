@@ -11,6 +11,7 @@ import {
 } from "./ui/Field";
 
 type Step = "NONE" | "BUY" | "PAY" | "USER" | "CONFIRM" | "REPORT" | "TICKETS";
+const REPORT_TIME_SECONDS = 10 * 60; // 10 minutos
 
 export default function RifasElManao() {
   const [step, setStep] = useState<Step>("NONE");
@@ -34,6 +35,11 @@ export default function RifasElManao() {
     phone: "",
     proofFile: null as File | null,
   });
+  function formatTime(seconds: number) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
 
   const [generatedTickets, setGeneratedTickets] = useState<string[]>([]);
 
@@ -66,6 +72,9 @@ export default function RifasElManao() {
     cc: "V",
     ci: "",
   });
+  const [reportSecondsLeft, setReportSecondsLeft] = useState<number | null>(
+    null
+  );
 
   const [loadingTickets, setLoadingTickets] = useState(false);
   const [lots, setLots] = useState<TicketsLot[]>([]);
@@ -97,6 +106,17 @@ export default function RifasElManao() {
 
     return () => clearInterval(timer);
   }, []);
+  useEffect(() => {
+    if (step !== "CONFIRM" || reportSecondsLeft === null) return;
+
+    if (reportSecondsLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setReportSecondsLeft((prev) => (prev !== null ? prev - 1 : prev));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [step, reportSecondsLeft]);
 
   const total = currentRaffle.price * customQuantity;
   const progress =
@@ -292,25 +312,104 @@ export default function RifasElManao() {
                 </div>
               </div>
             </div>
-
             <div className="mt-4 flex flex-col gap-3">
-              <button
-                className="w-full rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition"
-                onClick={() => setStep("BUY")}
-              >
-                Comprar boletos
-              </button>
+              {/* ✅ Si NO estás en BUY, muestra los 2 botones */}
+              {step !== "BUY" && (
+                <>
+                  <button
+                    className="w-full rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition"
+                    onClick={() => setStep("BUY")}
+                  >
+                    Comprar boletos
+                  </button>
 
-              <button
-                className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-yellow-50 hover:border-yellow-400 transition"
-                onClick={() => {
-                  setCedulaForm({ cc: "V", ci: "" });
-                  setTicketsError("");
-                  setShowTicketsModal(true);
-                }}
-              >
-                Ver boletos comprados
-              </button>
+                  <button
+                    className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-yellow-50 hover:border-yellow-400 transition"
+                    onClick={() => {
+                      setCedulaForm({ cc: "V", ci: "" });
+                      setTicketsError("");
+                      setShowTicketsModal(true);
+                    }}
+                  >
+                    Ver boletos comprados
+                  </button>
+                </>
+              )}
+
+              {/* ✅ Si estás en BUY, muestra el selector inline */}
+              {step === "BUY" && (
+                <div className="mt-2 space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[2, 5, 10, 20, 30, 50].map((qty) => {
+                      const selected = selectedQuantity === qty;
+                      const popular = qty === 5;
+
+                      return (
+                        <button
+                          key={qty}
+                          onClick={() => {
+                            setSelectedQuantity(qty);
+                            setCustomQuantity(qty);
+                          }}
+                          className={`relative rounded-xl border-2 p-6 text-center text-3xl font-black transition
+                ${
+                  selected
+                    ? "border-yellow-400 bg-yellow-50"
+                    : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
+                }`}
+                        >
+                          {qty}
+                          {popular && (
+                            <span className="absolute left-1/2 -translate-x-1/2 bottom-3 text-[11px] font-black text-yellow-600">
+                              Más popular
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="text-center text-sm font-black text-slate-900">
+                    {customQuantity}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      className="h-12 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
+                      onClick={() =>
+                        setCustomQuantity((q) => Math.max(1, q - 1))
+                      }
+                    >
+                      −
+                    </button>
+                    <button
+                      className="h-12 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
+                      onClick={() => setCustomQuantity((q) => q + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* ✅ Pagar abre el overlay */}
+                  <button
+                    className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 hover:bg-yellow-500 transition"
+                    onClick={() => setStep("PAY")}
+                  >
+                    Pagar Bs. {total.toFixed(2)}
+                  </button>
+
+                  <button
+                    className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
+                    onClick={() => {
+                      setSelectedQuantity(2);
+                      setCustomQuantity(2);
+                      setStep("NONE"); // ✅ vuelve a mostrar los 2 botones
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="mt-5 border-t pt-5">
@@ -453,22 +552,29 @@ export default function RifasElManao() {
                   onClick={() => setShowLotDetail(lot)}
                   className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-yellow-400 hover:bg-yellow-50 transition"
                 >
-                  <div className="flex justify-between">
-                    <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
                       <div className="text-sm font-black text-slate-900">
                         {lot.quantity} boletos
                       </div>
-                      <div className="text-xs font-bold text-slate-500">
+
+                      <div className="mt-1 text-xs font-bold text-slate-500">
                         {new Date(lot.createdAt).toLocaleDateString()}
+                      </div>
+
+                      {/* ✅ Hint */}
+                      <div className="mt-2 text-[11px] font-black text-slate-400">
+                        Click para mayor información
                       </div>
                     </div>
 
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <div className="text-sm font-black text-slate-900">
                         Bs. {lot.totalAmount}
                       </div>
+
                       <div
-                        className={`text-xs font-black ${
+                        className={`mt-1 text-xs font-black ${
                           lot.status === "confirmed"
                             ? "text-emerald-600"
                             : "text-yellow-600"
@@ -476,6 +582,9 @@ export default function RifasElManao() {
                       >
                         {lot.status.toUpperCase()}
                       </div>
+
+                      {/* ✅ Flecha visual */}
+                      <div className="mt-3 text-slate-400 font-black">›</div>
                     </div>
                   </div>
                 </button>
@@ -528,79 +637,6 @@ export default function RifasElManao() {
         )}
       </Modal>
 
-      {/* BUY */}
-      <Modal
-        open={step === "BUY"}
-        title="Comprar boletos"
-        onClose={() => setStep("NONE")}
-        maxWidthClass="max-w-2xl"
-      >
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-            {[2, 5, 10, 20, 30, 50].map((qty) => {
-              const selected = selectedQuantity === qty;
-              const popular = qty === 5;
-              return (
-                <button
-                  key={qty}
-                  onClick={() => {
-                    setSelectedQuantity(qty);
-                    setCustomQuantity(qty);
-                  }}
-                  className={`relative rounded-xl border-2 p-5 text-center text-3xl font-black transition
-                    ${
-                      selected
-                        ? "border-yellow-400 bg-yellow-50"
-                        : "border-transparent bg-slate-50 hover:border-yellow-400 hover:bg-yellow-50 "
-                    }`}
-                >
-                  {qty}
-                  {popular && (
-                    <span className="absolute -right-2 -top-2 rounded-full bg-yellow-400 px-3 py-1 text-[10px] font-black uppercase">
-                      Más popular
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4">
-            <div className="text-sm font-black text-slate-900">Cantidad</div>
-            <div className="flex items-center gap-4">
-              <button
-                className="h-10 w-10 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
-                onClick={() => setCustomQuantity((q) => Math.max(1, q - 1))}
-              >
-                −
-              </button>
-              <div className="min-w-10 text-center text-lg font-black">
-                {customQuantity}
-              </div>
-              <button
-                className="h-10 w-10 rounded-xl border-2 border-slate-200 bg-white font-black hover:border-yellow-400 hover:bg-yellow-50"
-                onClick={() => setCustomQuantity((q) => q + 1)}
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <PrimaryButton onClick={() => setStep("PAY")}>
-            Pagar Bs. {total.toFixed(2)}
-          </PrimaryButton>
-
-          <SecondaryButton
-            onClick={() => {
-              setSelectedQuantity(2);
-              setCustomQuantity(2);
-            }}
-          >
-            Limpiar todo
-          </SecondaryButton>
-        </div>
-      </Modal>
-
       {/* PAY */}
       <Modal
         open={step === "PAY"}
@@ -626,54 +662,74 @@ export default function RifasElManao() {
             </div>
           </div>
 
-          {[
-            {
-              id: "pago-movil",
-              title: "Pago móvil",
-              desc: "Mínimo 2 boletos",
-              badge: "📱",
-            },
-            {
-              id: "binance",
-              title: "Binance Pay",
-              desc: "Divisas",
-              badge: "₿",
-            },
-            { id: "zelle", title: "Zelle", desc: "Transferencia", badge: "$" },
-          ].map((m) => {
-            const selected = selectedPayment === m.id;
-            return (
-              <button
-                key={m.id}
-                onClick={() => setSelectedPayment(m.id)}
-                className={`w-full rounded-xl border-2 p-4 text-left transition flex items-center gap-3
-                ${
-                  selected
-                    ? "border-yellow-400 bg-yellow-50"
-                    : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
-                }`}
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-400/90 text-lg font-black">
-                  {m.badge}
+          <div className="grid grid-cols-2 gap-4">
+            {/* PAGO MÓVIL (ACTIVO) */}
+            <button
+              onClick={() => setSelectedPayment("pago-movil")}
+              className={`relative rounded-xl border-2 p-4 text-left transition flex items-center gap-3
+      ${
+        selectedPayment === "pago-movil"
+          ? "border-yellow-400 bg-yellow-50"
+          : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
+      }`}
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-400 text-lg font-black">
+                📱
+              </div>
+
+              <div className="flex-1">
+                <div className="text-sm font-black text-slate-900">
+                  Pago móvil
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-black text-slate-900">
-                    {m.title}
-                  </div>
-                  <div className="text-xs font-bold text-slate-500">
-                    {m.desc}
-                  </div>
+                <div className="text-xs font-bold text-slate-500">
+                  Mínimo 2 boletos
                 </div>
-                <div
-                  className={`h-5 w-5 rounded-full border-2 ${
-                    selected
-                      ? "border-yellow-400 bg-yellow-400"
-                      : "border-slate-300"
-                  }`}
-                />
-              </button>
-            );
-          })}
+              </div>
+
+              <div
+                className={`h-5 w-5 rounded-full border-2
+        ${
+          selectedPayment === "pago-movil"
+            ? "border-yellow-400 bg-yellow-400"
+            : "border-slate-300"
+        }`}
+              />
+            </button>
+
+            {/* BINANCE PAY (DESHABILITADO) */}
+            <div className="relative rounded-xl border-2 border-slate-200 bg-slate-50 p-4 flex items-center gap-3 opacity-60 cursor-not-allowed">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-300 text-lg font-black">
+                ₿
+              </div>
+
+              <div className="flex-1">
+                <div className="text-sm font-black text-slate-600">
+                  Binance Pay
+                </div>
+                <div className="text-xs font-bold text-slate-400">
+                  Mínimo 40 boletos
+                </div>
+              </div>
+
+              <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
+            </div>
+
+            {/* ZELLE (DESHABILITADO, ABAJO IZQUIERDA) */}
+            <div className="relative rounded-xl border-2 border-slate-200 bg-slate-50 p-4 flex items-center gap-3 opacity-60 cursor-not-allowed col-span-1">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-300 text-lg font-black">
+                $
+              </div>
+
+              <div className="flex-1">
+                <div className="text-sm font-black text-slate-600">Zelle</div>
+                <div className="text-xs font-bold text-slate-400">
+                  Mínimo 40 boletos
+                </div>
+              </div>
+
+              <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
+            </div>
+          </div>
 
           <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-xs font-bold text-yellow-900">
             Al continuar aceptas Términos y condiciones.
@@ -772,7 +828,10 @@ export default function RifasElManao() {
                 !userData.email ||
                 !selectedPayment
               }
-              onClick={() => setStep("CONFIRM")}
+              onClick={() => {
+                setReportSecondsLeft(REPORT_TIME_SECONDS);
+                setStep("CONFIRM");
+              }}
             >
               {loading ? "Creando..." : "Pagar"}
             </PrimaryButton>
@@ -793,7 +852,12 @@ export default function RifasElManao() {
           </p>
 
           <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-xs font-black text-yellow-900 inline-flex items-center gap-2">
-            ⏱️ 0–10 min para reportar
+            ⏱️ Tiempo para reportar:
+            <span className="font-black">
+              {reportSecondsLeft !== null
+                ? formatTime(reportSecondsLeft)
+                : "10:00"}
+            </span>
           </div>
 
           <div className="rounded-xl bg-slate-50 p-4">

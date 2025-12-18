@@ -457,7 +457,7 @@ export async function POST(request: NextRequest) {
       assignedTickets,
       transactionDate,
 
-      status: "pending",
+      status: "confirmed",
       createdAt: new Date(),
     };
 
