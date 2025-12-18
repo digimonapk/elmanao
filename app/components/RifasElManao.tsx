@@ -759,7 +759,9 @@ export default function RifasElManao() {
                 </div>
                 <div className="flex justify-between">
                   <span>Estado</span>
-                  <span className="uppercase">{showLotDetail.status}</span>
+                  <span className="uppercase">
+                    {getStatusLabel(showLotDetail.status)}
+                  </span>
                 </div>
               </div>
 
