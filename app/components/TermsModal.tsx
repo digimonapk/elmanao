@@ -66,10 +66,7 @@ export default function TermsModal() {
               Si el ganador no reclama su premio en 48 horas, se realizará un
               nuevo sorteo.
             </li>
-            <li>
-              Los premios en dinero se entregan mediante transferencia bancaria
-              a tasa BCV.
-            </li>
+
             <li>
               Los ganadores aceptan que su nombre, foto o video puedan ser
               publicados en nuestras redes.

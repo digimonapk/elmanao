@@ -17,7 +17,6 @@ const REPORT_TIME_SECONDS = 10 * 60; // 10 minutos
 
 export default function RifasElManao() {
   const [step, setStep] = useState<Step>("NONE");
-  const [selectedQuantity, setSelectedQuantity] = useState(5);
   const [customQuantity, setCustomQuantity] = useState(5);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [qtyInput, setQtyInput] = useState<string>(String(customQuantity));
@@ -42,6 +41,18 @@ export default function RifasElManao() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${String(s).padStart(2, "0")}`;
+  }
+  function getStatusLabel(status: string) {
+    switch (status) {
+      case "pending":
+        return "PENDIENTE";
+      case "confirmed":
+        return "CONFIRMADO";
+      case "rejected":
+        return "RECHAZADO";
+      default:
+        return String(status || "").toUpperCase();
+    }
   }
 
   const [generatedTickets, setGeneratedTickets] = useState<string[]>([]);
@@ -90,6 +101,7 @@ export default function RifasElManao() {
   const [reportSecondsLeft, setReportSecondsLeft] = useState<number | null>(
     null
   );
+  const [selectedQuantity, setSelectedQuantity] = useState(5);
 
   const [loadingTickets, setLoadingTickets] = useState(false);
   const [lots, setLots] = useState<TicketsLot[]>([]);
@@ -709,10 +721,12 @@ export default function RifasElManao() {
                           className={`mt-1 text-xs font-black ${
                             lot.status === "confirmed"
                               ? "text-emerald-600"
+                              : lot.status === "rejected"
+                              ? "text-red-600"
                               : "text-yellow-600"
                           }`}
                         >
-                          {lot.status.toUpperCase()}
+                          {getStatusLabel(lot.status)}
                         </div>
 
                         {/* ✅ Flecha visual */}
