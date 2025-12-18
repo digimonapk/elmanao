@@ -17,8 +17,8 @@ const REPORT_TIME_SECONDS = 10 * 60; // 10 minutos
 
 export default function RifasElManao() {
   const [step, setStep] = useState<Step>("NONE");
-  const [selectedQuantity, setSelectedQuantity] = useState(2);
-  const [customQuantity, setCustomQuantity] = useState(2);
+  const [selectedQuantity, setSelectedQuantity] = useState(5);
+  const [customQuantity, setCustomQuantity] = useState(5);
   const [selectedPayment, setSelectedPayment] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -492,8 +492,8 @@ export default function RifasElManao() {
                   <button
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
                     onClick={() => {
-                      setSelectedQuantity(2);
-                      setCustomQuantity(2);
+                      setSelectedQuantity(5);
+                      setCustomQuantity(5);
                     }}
                   >
                     Limpiar todo
