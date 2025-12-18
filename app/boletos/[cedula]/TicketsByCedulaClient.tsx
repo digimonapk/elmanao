@@ -19,7 +19,7 @@ type TicketLot = {
 function normalizeCedula(raw: string) {
   const s = (raw || "").trim().toUpperCase();
   // permite V123 o V-123 o v 123
-  const match = s.match(/^([VEJG])\s*-?\s*(\d{4,12})$/);
+  const match = s.match(/^([VEJG])\s*-?\s*(\d{4,24})$/);
   if (!match) return "";
   return `${match[1]}${match[2]}`;
 }
