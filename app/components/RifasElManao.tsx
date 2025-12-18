@@ -485,6 +485,7 @@ export default function RifasElManao() {
               <Input
                 placeholder="00000000"
                 value={cedulaForm.ci}
+                className="text-base"
                 onChange={(e) =>
                   setCedulaForm({
                     ...cedulaForm,
@@ -761,6 +762,7 @@ export default function RifasElManao() {
           <div>
             <Label>Nombre completo</Label>
             <Input
+              className="text-base"
               value={userData.fullName}
               onChange={(e: { target: { value: any } }) =>
                 setUserData({ ...userData, fullName: e.target.value })
@@ -784,6 +786,7 @@ export default function RifasElManao() {
                 <option value="G">G</option>
               </Select>
               <Input
+                className="text-base"
                 value={userData.cedulaNumber}
                 onChange={(e: { target: { value: any } }) =>
                   setUserData({ ...userData, cedulaNumber: e.target.value })
@@ -795,6 +798,7 @@ export default function RifasElManao() {
           <div>
             <Label>Teléfono</Label>
             <Input
+              className="text-base"
               value={userData.phone}
               onChange={(e: { target: { value: any } }) =>
                 setUserData({ ...userData, phone: e.target.value })
@@ -805,6 +809,7 @@ export default function RifasElManao() {
           <div>
             <Label>Correo comprador</Label>
             <Input
+              className="text-base"
               type="email"
               value={userData.email}
               onChange={(e: { target: { value: any } }) =>
@@ -928,6 +933,7 @@ export default function RifasElManao() {
             <Label>Número de referencia</Label>
             <div className="flex gap-2">
               <Input
+                className="text-base"
                 placeholder="Ej: 1234567890"
                 value={reportData.reference}
                 onChange={(e: { target: { value: any } }) =>
@@ -967,6 +973,7 @@ export default function RifasElManao() {
               </Select>
 
               <Input
+                className="text-base"
                 placeholder="Ej: 1234567"
                 value={reportData.phone}
                 onChange={(e: { target: { value: string } }) =>

@@ -129,7 +129,7 @@ export default function TicketsByCedulaClient({
           <div className="text-sm font-black text-slate-900 mb-2">Cédula</div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <input
-              className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-900 outline-none focus:border-yellow-400"
+              className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-900 outline-none focus:border-yellow-400 text-base"
               placeholder="Ej: V123123"
               value={cedula}
               onChange={(e) => setCedula(e.target.value.toUpperCase())}

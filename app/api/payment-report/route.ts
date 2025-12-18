@@ -395,7 +395,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!userIdNumber || userIdNumber.length < 4) {
+    if (!userIdNumber) {
       return NextResponse.json(
         { ok: false, error: "userIdNumber inválido" },
         { status: 400 }
