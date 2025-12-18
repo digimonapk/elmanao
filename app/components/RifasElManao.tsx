@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Modal } from "./ui/Modal";
 import { Copy, Check } from "lucide-react";
-
+import TermsModal from "./TermsModal";
 import {
   Input,
   Label,
@@ -304,414 +304,903 @@ export default function RifasElManao() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 shadow">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="w-24" />
-          <div className="flex items-center gap-3">
-            <div className="leading-tight">
-              <img src="logo.png" alt="" width={100} />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="h-10 w-10 rounded-full bg-black/10 hover:bg-black/20">
-              🌙
-            </button>
-            <button className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-black text-white shadow hover:bg-emerald-600">
-              WhatsApp
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Timer */}
-      <div className="bg-white shadow-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 px-4 py-3">
-          <span className="text-yellow-500">⏱️</span>
-          <span className="text-xs font-black text-slate-500">
-            Estás a tiempo
-          </span>
-          <div className="flex items-center gap-2 text-xs font-black text-slate-900">
-            <span>{timeLeft.days} D</span>
-            <span className="text-slate-300">:</span>
-            <span>{timeLeft.hours} H</span>
-            <span className="text-slate-300">:</span>
-            <span>{String(timeLeft.minutes).padStart(2, "0")} M</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main */}
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
-            <img
-              className="h-[360px] w-full object-cover"
-              src="1.png"
-              alt="Premio"
-            />
-          </div>
-
-          <div className="rounded-2xl bg-white p-4 sm:p-6 shadow-xl">
-            <h1 className="mb-4 text-2xl font-black text-slate-900">
-              {currentRaffle.title} <span>🔥</span>
-            </h1>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="mb-1 text-[11px] font-black text-slate-500">
-                  Sorteo
-                </div>
-                <div className="text-sm font-black text-slate-900">
-                  {currentRaffle.date}
-                </div>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="mb-1 text-[11px] font-black text-slate-500">
-                  Boleto
-                </div>
-                <div className="text-sm font-black text-slate-900">
-                  Bs. {currentRaffle.price.toFixed(2)}
-                </div>
+    <>
+      <TermsModal />{" "}
+      <div className="min-h-screen bg-slate-100">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 shadow">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+            <div className="w-24" />
+            <div className="flex items-center gap-3">
+              <div className="leading-tight">
+                <img src="logo.png" alt="" width={100} />
               </div>
             </div>
-            <div className="mt-4 flex flex-col gap-3">
-              {/* ✅ Si NO estás en BUY, muestra los 2 botones */}
-              {step !== "BUY" && (
-                <>
-                  <button
-                    className="w-full rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition"
-                    onClick={() => setStep("BUY")}
-                  >
-                    Comprar boletos
-                  </button>
+            <div className="flex items-center gap-2">
+              <button className="h-10 w-10 rounded-full bg-black/10 hover:bg-black/20">
+                🌙
+              </button>
+              <button className="rounded-full bg-emerald-500 px-4 py-2 text-xs font-black text-white shadow hover:bg-emerald-600">
+                WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
 
-                  <button
-                    className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-yellow-50 hover:border-yellow-400 transition"
-                    onClick={() => {
-                      setCedulaForm({ cc: "V", ci: "" });
-                      setTicketsError("");
-                      setShowTicketsModal(true);
-                    }}
-                  >
-                    Ver boletos comprados
-                  </button>
-                </>
-              )}
+        {/* Timer */}
+        <div className="bg-white shadow-sm">
+          <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 px-4 py-3">
+            <span className="text-yellow-500">⏱️</span>
+            <span className="text-xs font-black text-slate-500">
+              Estás a tiempo
+            </span>
+            <div className="flex items-center gap-2 text-xs font-black text-slate-900">
+              <span>{timeLeft.days} D</span>
+              <span className="text-slate-300">:</span>
+              <span>{timeLeft.hours} H</span>
+              <span className="text-slate-300">:</span>
+              <span>{String(timeLeft.minutes).padStart(2, "0")} M</span>
+            </div>
+          </div>
+        </div>
 
-              {/* ✅ Si estás en BUY, muestra el selector inline */}
-              {step === "BUY" && (
-                <div className="mt-2 space-y-4">
-                  {/* Header BUY como la foto */}
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-black text-slate-900">
-                      Comprar boletos
-                    </div>
-                    <button
-                      className="h-9 w-9 rounded-full border border-slate-200 bg-white font-black text-slate-700 hover:bg-slate-50"
-                      onClick={() => setStep("NONE")}
-                      aria-label="Cerrar"
-                    >
-                      ✕
-                    </button>
+        {/* Main */}
+        <div className="mx-auto max-w-5xl px-4 py-8">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
+              <img
+                className="h-[360px] w-full object-cover"
+                src="1.png"
+                alt="Premio"
+              />
+            </div>
+
+            <div className="rounded-2xl bg-white p-4 sm:p-6 shadow-xl">
+              <h1 className="mb-4 text-2xl font-black text-slate-900">
+                {currentRaffle.title} <span>🔥</span>
+              </h1>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <div className="mb-1 text-[11px] font-black text-slate-500">
+                    Sorteo
                   </div>
+                  <div className="text-sm font-black text-slate-900">
+                    {currentRaffle.date}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-4">
+                  <div className="mb-1 text-[11px] font-black text-slate-500">
+                    Boleto
+                  </div>
+                  <div className="text-sm font-black text-slate-900">
+                    Bs. {currentRaffle.price.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-col gap-3">
+                {/* ✅ Si NO estás en BUY, muestra los 2 botones */}
+                {step !== "BUY" && (
+                  <>
+                    <button
+                      className="w-full rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition"
+                      onClick={() => setStep("BUY")}
+                    >
+                      Comprar boletos
+                    </button>
 
-                  {/* ✅ En celular: 3 columnas como la imagen */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {[5, 10, 20, 30, 50, 100].map((qty) => {
-                      const selected = customQuantity === qty;
-                      const popular = qty === 10;
+                    <button
+                      className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-yellow-50 hover:border-yellow-400 transition"
+                      onClick={() => {
+                        setCedulaForm({ cc: "V", ci: "" });
+                        setTicketsError("");
+                        setShowTicketsModal(true);
+                      }}
+                    >
+                      Ver boletos comprados
+                    </button>
+                  </>
+                )}
 
-                      return (
-                        <button
-                          key={qty}
-                          onClick={() => {
-                            setSelectedQuantity(qty);
-                            setCustomQuantity(qty);
-                          }}
-                          className={`relative rounded-xl border p-4 text-center text-2xl font-black transition
+                {/* ✅ Si estás en BUY, muestra el selector inline */}
+                {step === "BUY" && (
+                  <div className="mt-2 space-y-4">
+                    {/* Header BUY como la foto */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-black text-slate-900">
+                        Comprar boletos
+                      </div>
+                      <button
+                        className="h-9 w-9 rounded-full border border-slate-200 bg-white font-black text-slate-700 hover:bg-slate-50"
+                        onClick={() => setStep("NONE")}
+                        aria-label="Cerrar"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {/* ✅ En celular: 3 columnas como la imagen */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[5, 10, 20, 30, 50, 100].map((qty) => {
+                        const selected = customQuantity === qty;
+                        const popular = qty === 10;
+
+                        return (
+                          <button
+                            key={qty}
+                            onClick={() => {
+                              setSelectedQuantity(qty);
+                              setCustomQuantity(qty);
+                            }}
+                            className={`relative rounded-xl border p-4 text-center text-2xl font-black transition
               ${
                 selected
                   ? "border-slate-300 bg-slate-200 text-slate-900"
                   : "border-slate-200 bg-white hover:border-yellow-400 hover:bg-yellow-50"
               }`}
+                          >
+                            {qty}
+
+                            {popular && (
+                              <div className="mt-1 text-[10px] font-black text-yellow-600">
+                                Más popular
+                              </div>
+                            )}
+
+                            {selected && (
+                              <div className="mt-1 text-[10px] font-black text-slate-700">
+                                Seleccionado
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Cantidad centrada */}
+                    <div className="text-center text-sm font-black text-slate-900">
+                      {customQuantity}
+                    </div>
+
+                    <div className="border-t border-slate-200" />
+
+                    {/* Botones - + como la foto */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
+                        onClick={() =>
+                          setCustomQuantity((q) => Math.max(5, q - 1))
+                        }
+                      >
+                        −
+                      </button>
+                      <button
+                        className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
+                        onClick={() => setCustomQuantity((q) => q + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Pagar */}
+                    <button
+                      className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 hover:bg-yellow-500 transition"
+                      onClick={() => setStep("PAY")}
+                    >
+                      Pagar Bs. {total.toFixed(2)}
+                    </button>
+
+                    {/* Limpiar todo */}
+                    <button
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
+                      onClick={() => {
+                        setSelectedQuantity(5);
+                        setCustomQuantity(5);
+                      }}
+                    >
+                      Limpiar todo
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-5 border-t pt-5">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="mt-2 text-xs font-black text-slate-500">
+                  Queda un {progress.toFixed(2)}% de los boletos
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 className="mt-10 mb-4 text-lg font-black text-slate-900">
+            Echa un vistazo a nuestros últimos sorteos
+          </h2>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {previousRaffles.map((r) => (
+              <div
+                key={r.id}
+                className="overflow-hidden rounded-2xl bg-white shadow-lg hover:-translate-y-[2px] transition"
+              >
+                <div className="relative h-56">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={`${r.img}`}
+                    alt={`Sorteo ${r.id}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  <div className="absolute bottom-3 left-24 text-xs font-black text-white/90">
+                    <div>{r.tag}</div>
+                    <div className="text-white/70">premiados</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ✅ ONE MODAL (steps) */}
+        <Modal
+          open={showTicketsModal}
+          title="Ver mis boletos comprados"
+          onClose={() => setShowTicketsModal(false)}
+          maxWidthClass="max-w-md"
+        >
+          <div className="space-y-4">
+            <p className="text-xs font-semibold text-slate-500">
+              Escribe el número de cédula que utilizaste para comprar tus
+              boletos
+            </p>
+
+            <div>
+              <Label>Cédula</Label>
+              <div className="flex gap-2">
+                <Select
+                  className="w-24"
+                  value={cedulaForm.cc}
+                  onChange={(e) =>
+                    setCedulaForm({ ...cedulaForm, cc: e.target.value })
+                  }
+                >
+                  <option value="V">V</option>
+                  <option value="E">E</option>
+                  <option value="J">J</option>
+                  <option value="G">G</option>
+                </Select>
+
+                <Input
+                  placeholder="00000000"
+                  value={cedulaForm.ci}
+                  className="text-base"
+                  onChange={(e) =>
+                    setCedulaForm({
+                      ...cedulaForm,
+                      ci: e.target.value.replace(/\D/g, ""),
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            {ticketsError && (
+              <div className="text-xs font-bold text-red-600">
+                {ticketsError}
+              </div>
+            )}
+
+            <PrimaryButton
+              disabled={!cedulaForm.ci || loadingTickets}
+              onClick={async () => {
+                setLoadingTickets(true);
+                setTicketsError("");
+
+                try {
+                  const res = await fetch(
+                    `/api/tickets-by-cedula?cc=${cedulaForm.cc}&ci=${cedulaForm.ci}`
+                  );
+                  const json = await res.json();
+
+                  if (!res.ok || !json.ok) {
+                    setTicketsError(json?.error || "No se encontraron boletos");
+                    return;
+                  }
+
+                  setLots(json.lots || []);
+                  setShowTicketsModal(false);
+                  setShowLotsModal(true);
+                } finally {
+                  setLoadingTickets(false);
+                }
+              }}
+            >
+              {loadingTickets ? "Buscando..." : "Ver boletos"}
+            </PrimaryButton>
+          </div>
+        </Modal>
+
+        <Modal
+          open={showLotsModal}
+          title="Boletos comprados"
+          onClose={() => setShowLotsModal(false)}
+          maxWidthClass="max-w-lg"
+        >
+          <div className="space-y-4">
+            <div className="text-xs font-bold text-slate-500">
+              Rifa:{" "}
+              <span className="text-slate-900">CAMBIA TU VIDA #1.0 🔥</span>
+            </div>
+
+            {lots.length === 0 ? (
+              <div className="text-sm font-semibold text-slate-500">
+                Aún no tienes compras aprobadas en esta rifa
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {lots.map((lot) => (
+                  <button
+                    key={lot.lotId}
+                    onClick={() => setShowLotDetail(lot)}
+                    className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-yellow-400 hover:bg-yellow-50 transition"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-black text-slate-900">
+                          {lot.quantity} boletos
+                        </div>
+
+                        <div className="mt-1 text-xs font-bold text-slate-500">
+                          {new Date(lot.createdAt).toLocaleDateString()}
+                        </div>
+
+                        {/* ✅ Hint */}
+                        <div className="mt-2 text-[11px] font-black text-slate-400">
+                          Click para mayor información
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-black text-slate-900">
+                          Bs. {lot.totalAmount}
+                        </div>
+
+                        <div
+                          className={`mt-1 text-xs font-black ${
+                            lot.status === "confirmed"
+                              ? "text-emerald-600"
+                              : "text-yellow-600"
+                          }`}
                         >
-                          {qty}
+                          {lot.status.toUpperCase()}
+                        </div>
 
-                          {popular && (
-                            <div className="mt-1 text-[10px] font-black text-yellow-600">
-                              Más popular
-                            </div>
-                          )}
+                        {/* ✅ Flecha visual */}
+                        <div className="mt-3 text-slate-400 font-black">›</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </Modal>
 
-                          {selected && (
-                            <div className="mt-1 text-[10px] font-black text-slate-700">
-                              Seleccionado
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+        <Modal
+          open={!!showLotDetail}
+          title="Detalle de compra"
+          onClose={() => setShowLotDetail(null)}
+          maxWidthClass="max-w-lg"
+        >
+          {showLotDetail && (
+            <div className="space-y-4">
+              <div className="rounded-xl bg-slate-50 p-4 text-sm font-bold">
+                <div className="flex justify-between">
+                  <span>Cantidad</span>
+                  <span>{showLotDetail.quantity}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Total</span>
+                  <span>Bs. {showLotDetail.totalAmount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Estado</span>
+                  <span className="uppercase">{showLotDetail.status}</span>
+                </div>
+              </div>
+
+              <div className="text-xs font-black text-slate-500">
+                Tus boletos
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {showLotDetail.tickets.map((t) => (
+                  <div
+                    key={t}
+                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-900"
+                  >
+                    {t}
                   </div>
+                ))}
+              </div>
 
-                  {/* Cantidad centrada */}
-                  <div className="text-center text-sm font-black text-slate-900">
-                    {customQuantity}
+              <PrimaryButton onClick={() => setShowLotDetail(null)}>
+                Volver
+              </PrimaryButton>
+            </div>
+          )}
+        </Modal>
+
+        {/* PAY */}
+        <Modal
+          open={step === "PAY"}
+          title="¿Cómo quieres pagar?"
+          onClose={() => setStep("NONE")}
+          maxWidthClass="max-w-xl"
+        >
+          <div className="space-y-6">
+            {/* Resumen (como la foto: limpio, con separadores) */}
+            <div className="space-y-3">
+              <div className="flex items-start justify-between text-sm">
+                <div className="text-slate-500 leading-tight">
+                  Precio por <br /> boleto
+                </div>
+                <div className="font-semibold text-slate-900">
+                  Bs. {currentRaffle.price.toFixed(2)}
+                </div>
+              </div>
+
+              <div className="flex items-start justify-between text-sm">
+                <div className="text-slate-500 leading-tight">
+                  Cantidad de <br /> boletos
+                </div>
+                <div className="font-semibold text-slate-900">
+                  {customQuantity}
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 pt-3 flex items-center justify-between text-sm">
+                <div className="text-slate-500">Total a pagar</div>
+                <div className="font-semibold text-slate-900">
+                  Bs. {total.toFixed(2)}
+                </div>
+              </div>
+            </div>
+
+            {/* Título sección */}
+            <div className="text-sm font-black text-slate-900">
+              Elige el método de pago para continuar
+            </div>
+
+            {/* Métodos en L con más aire */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* PAGO MÓVIL (ACTIVO) */}
+              <button
+                type="button"
+                onClick={() => setSelectedPayment("pago-movil")}
+                className={`relative rounded-xl border p-5 text-left transition bg-white
+          ${
+            selectedPayment === "pago-movil"
+              ? "border-yellow-400"
+              : "border-slate-200 hover:border-yellow-400"
+          }`}
+              >
+                {/* radio arriba derecha */}
+                <span
+                  className={`absolute right-4 top-4 h-4 w-4 rounded-full border-2
+            ${
+              selectedPayment === "pago-movil"
+                ? "border-yellow-400 bg-yellow-400"
+                : "border-yellow-400"
+            }`}
+                />
+
+                {/* icono simple como la foto */}
+                <div className="text-yellow-500 text-2xl leading-none">📱</div>
+
+                <div className="mt-3 text-sm font-black text-slate-900">
+                  Pago móvil
+                </div>
+                <div className="mt-1 text-xs font-semibold text-slate-500">
+                  Mínimo 5 boletos
+                </div>
+              </button>
+
+              {/* BINANCE PAY (INHABILITADO) */}
+              <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60">
+                <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
+
+                <div className="text-yellow-500 text-2xl leading-none">🔸</div>
+
+                <div className="mt-3 text-sm font-black text-slate-900">
+                  Binance Pay
+                </div>
+                <div className="mt-1 text-xs font-semibold text-slate-500">
+                  Mínimo 40 boletos
+                </div>
+              </div>
+
+              {/* ZELLE (INHABILITADO) abajo izquierda */}
+              <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60 col-span-1">
+                <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
+
+                <div className="text-yellow-500 text-2xl leading-none">⚡</div>
+
+                <div className="mt-3 text-sm font-black text-slate-900">
+                  Zelle
+                </div>
+                <div className="mt-1 text-xs font-semibold text-slate-500">
+                  Mínimo 40 boletos
+                </div>
+              </div>
+            </div>
+
+            {/* T&C como la foto (texto, link) */}
+            <div className="pt-2 text-center text-xs font-semibold text-slate-600">
+              Al presionar "Continuar" declaras haber leído y aceptado nuestros{" "}
+              <a className="text-blue-600 font-black underline" href="#">
+                Términos y condiciones
+              </a>
+              .
+            </div>
+
+            {/* Botones abajo con aire */}
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <button
+                type="button"
+                className="h-12 rounded-xl border border-slate-200 bg-white text-sm font-black text-slate-900 hover:bg-slate-50 transition"
+                onClick={() => setStep("BUY")}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className={`h-12 rounded-xl text-sm font-black transition
+          ${
+            selectedPayment
+              ? "bg-yellow-400 text-slate-900 hover:bg-yellow-500"
+              : "bg-yellow-200 text-slate-500 cursor-not-allowed"
+          }`}
+                onClick={() => setStep("USER")}
+                disabled={!selectedPayment}
+              >
+                Continuar
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* USER */}
+        <Modal
+          open={step === "USER"}
+          title="Indica tus datos"
+          onClose={() => setStep("NONE")}
+          maxWidthClass="max-w-xl"
+        >
+          <div className="space-y-4">
+            <div>
+              <Label>Nombre completo</Label>
+              <Input
+                className="text-base"
+                value={userData.fullName}
+                onChange={(e: { target: { value: any } }) =>
+                  setUserData({ ...userData, fullName: e.target.value })
+                }
+              />
+            </div>
+
+            <div>
+              <Label>Cédula</Label>
+              <div className="flex gap-2">
+                <Select
+                  className="w-24"
+                  value={userData.cedula}
+                  onChange={(e: { target: { value: any } }) =>
+                    setUserData({ ...userData, cedula: e.target.value })
+                  }
+                >
+                  <option value="V">V</option>
+                  <option value="E">E</option>
+                  <option value="J">J</option>
+                  <option value="G">G</option>
+                </Select>
+                <Input
+                  className="text-base"
+                  value={userData.cedulaNumber}
+                  onChange={(e: { target: { value: any } }) =>
+                    setUserData({ ...userData, cedulaNumber: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Teléfono</Label>
+              <Input
+                className="text-base"
+                value={userData.phone}
+                onChange={(e: { target: { value: any } }) =>
+                  setUserData({ ...userData, phone: e.target.value })
+                }
+              />
+            </div>
+
+            <div>
+              <Label>Correo comprador</Label>
+              <Input
+                className="text-base"
+                type="email"
+                value={userData.email}
+                onChange={(e: { target: { value: any } }) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <SecondaryButton full onClick={() => setStep("PAY")}>
+                Volver
+              </SecondaryButton>
+
+              <PrimaryButton
+                full
+                disabled={
+                  loading ||
+                  !userData.fullName ||
+                  !userData.cedulaNumber ||
+                  !userData.phone ||
+                  !userData.email ||
+                  !selectedPayment
+                }
+                onClick={() => {
+                  setReportSecondsLeft(REPORT_TIME_SECONDS);
+                  setStep("CONFIRM");
+                }}
+              >
+                {loading ? "Creando..." : "Pagar"}
+              </PrimaryButton>
+            </div>
+          </div>
+        </Modal>
+
+        {/* CONFIRM */}
+        <Modal
+          open={step === "CONFIRM"}
+          title="Realiza el pago"
+          onClose={() => setStep("NONE")}
+          maxWidthClass="max-w-xl"
+        >
+          <div className="space-y-4">
+            <p className="text-sm font-semibold text-slate-600">
+              Una vez realices el pago, reporta el comprobante.
+            </p>
+
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-xs font-black text-yellow-900 inline-flex items-center gap-2">
+              ⏱️ Tiempo para reportar:
+              <span className="font-black">
+                {reportSecondsLeft !== null
+                  ? formatTime(reportSecondsLeft)
+                  : "10:00"}
+              </span>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <div className="text-xs font-black text-slate-500 mb-2">
+                Monto exacto
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-2xl font-black text-slate-900">
+                  Bs. {total.toFixed(2)}
+                </div>
+                <button
+                  className="h-10 w-10 rounded-xl bg-yellow-400 flex items-center justify-center hover:bg-yellow-500 transition"
+                  onClick={() => copyWithFeedback("amount", total.toFixed(2))}
+                  aria-label="Copiar monto"
+                >
+                  <span
+                    className={`transition-all duration-200 ${
+                      copiedKey === "amount"
+                        ? "scale-110 opacity-100"
+                        : "scale-100 opacity-100"
+                    }`}
+                  >
+                    {copiedKey === "amount" ? (
+                      <Check className="h-5 w-5 text-slate-900 animate-[pop_180ms_ease-out]" />
+                    ) : (
+                      <Copy className="h-5 w-5 text-slate-900" />
+                    )}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* datos banco (puedes hacerlos dinámicos por método luego) */}
+            <div className="space-y-2">
+              {[
+                { label: "Banco", value: "0102 (Banco de Venezuela)" },
+                { label: "Cédula", value: "J30471053" },
+                { label: "Teléfono", value: "04121897013" },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  className="flex items-center justify-between rounded-xl bg-slate-50 p-3"
+                >
+                  <div className="text-xs font-black text-slate-500">
+                    {row.label}
                   </div>
-
-                  <div className="border-t border-slate-200" />
-
-                  {/* Botones - + como la foto */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs font-black text-slate-900">
+                      {row.value}
+                    </div>
                     <button
-                      className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
+                      className="h-8 w-8 rounded-lg bg-slate-200 flex items-center justify-center hover:bg-slate-300 transition"
                       onClick={() =>
-                        setCustomQuantity((q) => Math.max(5, q - 1))
+                        copyWithFeedback(`row-${row.label}`, row.value)
                       }
+                      aria-label={`Copiar ${row.label}`}
                     >
-                      −
-                    </button>
-                    <button
-                      className="h-12 rounded-xl border border-slate-200 bg-white text-xl font-black hover:bg-slate-50"
-                      onClick={() => setCustomQuantity((q) => q + 1)}
-                    >
-                      +
+                      {copiedKey === `row-${row.label}` ? (
+                        <Check className="h-4 w-4 text-slate-700 animate-[pop_180ms_ease-out]" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-slate-700" />
+                      )}
                     </button>
                   </div>
+                </div>
+              ))}
+            </div>
 
-                  {/* Pagar */}
-                  <button
-                    className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-xs font-black uppercase tracking-wide text-slate-900 hover:bg-yellow-500 transition"
-                    onClick={() => setStep("PAY")}
-                  >
-                    Pagar Bs. {total.toFixed(2)}
-                  </button>
+            <PrimaryButton onClick={() => setStep("REPORT")}>
+              Reportar pago
+            </PrimaryButton>
+          </div>
+        </Modal>
 
-                  {/* Limpiar todo */}
-                  <button
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900 hover:bg-slate-50 transition"
-                    onClick={() => {
-                      setSelectedQuantity(5);
-                      setCustomQuantity(5);
-                    }}
-                  >
-                    Limpiar todo
-                  </button>
+        {/* REPORT */}
+        <Modal
+          open={step === "REPORT"}
+          title="Detalla el pago que realizaste"
+          onClose={() => setStep("NONE")}
+          maxWidthClass="max-w-xl"
+        >
+          <div className="space-y-4">
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-xs font-bold text-yellow-900">
+              Tienes 10 minutos para reportar el pago o se cancela.
+            </div>
+
+            <div>
+              <Label>Número de referencia</Label>
+              <div className="flex gap-2">
+                <Input
+                  className="text-base"
+                  placeholder="Ej: 1234567890"
+                  value={reportData.reference}
+                  onChange={(e: { target: { value: any } }) =>
+                    setReportData({ ...reportData, reference: e.target.value })
+                  }
+                />
+                <SecondaryButton
+                  full={false}
+                  className="min-w-[92px]"
+                  onClick={async () => {
+                    const txt = await navigator.clipboard
+                      .readText()
+                      .catch(() => "");
+                    if (txt) setReportData((p) => ({ ...p, reference: txt }));
+                  }}
+                >
+                  Pegar
+                </SecondaryButton>
+              </div>
+            </div>
+
+            <div>
+              <Label>Teléfono emisor</Label>
+              <div className="flex gap-2">
+                <Select
+                  className="w-28"
+                  value={reportData.phonePrefix}
+                  onChange={(e: { target: { value: any } }) =>
+                    setReportData({
+                      ...reportData,
+                      phonePrefix: e.target.value,
+                    })
+                  }
+                >
+                  {["0414", "0424", "0412", "0416", "0426"].map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </Select>
+
+                <Input
+                  className="text-base"
+                  placeholder="Ej: 1234567"
+                  value={reportData.phone}
+                  onChange={(e: { target: { value: string } }) =>
+                    setReportData({
+                      ...reportData,
+                      phone: e.target.value.replace(/\D/g, ""),
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="text-sm font-black text-slate-900">
+                Cargar comprobante
+              </div>
+              <div className="mt-1 text-xs font-bold text-slate-500">
+                PNG, JPG hasta 2MB
+              </div>
+
+              <label className="mt-3 block cursor-pointer">
+                <div className="rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-center text-xs font-black text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition">
+                  Subir imagen
+                </div>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  className="hidden"
+                  onChange={(e) =>
+                    setReportData({
+                      ...reportData,
+                      proofFile: e.target.files?.[0] ?? null,
+                    })
+                  }
+                />
+              </label>
+
+              {reportData.proofFile && (
+                <div className="mt-3 text-xs font-black text-emerald-600">
+                  ✅ {reportData.proofFile.name}
                 </div>
               )}
             </div>
 
-            <div className="mt-5 border-t pt-5">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <div className="mt-2 text-xs font-black text-slate-500">
-                Queda un {progress.toFixed(2)}% de los boletos
-              </div>
+            <div className="grid grid-cols-2 gap-3">
+              <SecondaryButton full onClick={() => setStep("CONFIRM")}>
+                Volver
+              </SecondaryButton>
+
+              <PrimaryButton full onClick={reportPayment} disabled={loading}>
+                {loading ? "Enviando..." : "Confirmar compra"}
+              </PrimaryButton>
             </div>
           </div>
-        </div>
+        </Modal>
 
-        <h2 className="mt-10 mb-4 text-lg font-black text-slate-900">
-          Echa un vistazo a nuestros últimos sorteos
-        </h2>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {previousRaffles.map((r) => (
-            <div
-              key={r.id}
-              className="overflow-hidden rounded-2xl bg-white shadow-lg hover:-translate-y-[2px] transition"
-            >
-              <div className="relative h-56">
-                <img
-                  className="h-full w-full object-cover"
-                  src={`${r.img}`}
-                  alt={`Sorteo ${r.id}`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-                <div className="absolute bottom-3 left-24 text-xs font-black text-white/90">
-                  <div>{r.tag}</div>
-                  <div className="text-white/70">premiados</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ✅ ONE MODAL (steps) */}
-      <Modal
-        open={showTicketsModal}
-        title="Ver mis boletos comprados"
-        onClose={() => setShowTicketsModal(false)}
-        maxWidthClass="max-w-md"
-      >
-        <div className="space-y-4">
-          <p className="text-xs font-semibold text-slate-500">
-            Escribe el número de cédula que utilizaste para comprar tus boletos
-          </p>
-
-          <div>
-            <Label>Cédula</Label>
-            <div className="flex gap-2">
-              <Select
-                className="w-24"
-                value={cedulaForm.cc}
-                onChange={(e) =>
-                  setCedulaForm({ ...cedulaForm, cc: e.target.value })
-                }
-              >
-                <option value="V">V</option>
-                <option value="E">E</option>
-                <option value="J">J</option>
-                <option value="G">G</option>
-              </Select>
-
-              <Input
-                placeholder="00000000"
-                value={cedulaForm.ci}
-                className="text-base"
-                onChange={(e) =>
-                  setCedulaForm({
-                    ...cedulaForm,
-                    ci: e.target.value.replace(/\D/g, ""),
-                  })
-                }
-              />
-            </div>
-          </div>
-
-          {ticketsError && (
-            <div className="text-xs font-bold text-red-600">{ticketsError}</div>
-          )}
-
-          <PrimaryButton
-            disabled={!cedulaForm.ci || loadingTickets}
-            onClick={async () => {
-              setLoadingTickets(true);
-              setTicketsError("");
-
-              try {
-                const res = await fetch(
-                  `/api/tickets-by-cedula?cc=${cedulaForm.cc}&ci=${cedulaForm.ci}`
-                );
-                const json = await res.json();
-
-                if (!res.ok || !json.ok) {
-                  setTicketsError(json?.error || "No se encontraron boletos");
-                  return;
-                }
-
-                setLots(json.lots || []);
-                setShowTicketsModal(false);
-                setShowLotsModal(true);
-              } finally {
-                setLoadingTickets(false);
-              }
-            }}
-          >
-            {loadingTickets ? "Buscando..." : "Ver boletos"}
-          </PrimaryButton>
-        </div>
-      </Modal>
-
-      <Modal
-        open={showLotsModal}
-        title="Boletos comprados"
-        onClose={() => setShowLotsModal(false)}
-        maxWidthClass="max-w-lg"
-      >
-        <div className="space-y-4">
-          <div className="text-xs font-bold text-slate-500">
-            Rifa: <span className="text-slate-900">CAMBIA TU VIDA #1.0 🔥</span>
-          </div>
-
-          {lots.length === 0 ? (
-            <div className="text-sm font-semibold text-slate-500">
-              Aún no tienes compras aprobadas en esta rifa
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {lots.map((lot) => (
-                <button
-                  key={lot.lotId}
-                  onClick={() => setShowLotDetail(lot)}
-                  className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-yellow-400 hover:bg-yellow-50 transition"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-black text-slate-900">
-                        {lot.quantity} boletos
-                      </div>
-
-                      <div className="mt-1 text-xs font-bold text-slate-500">
-                        {new Date(lot.createdAt).toLocaleDateString()}
-                      </div>
-
-                      {/* ✅ Hint */}
-                      <div className="mt-2 text-[11px] font-black text-slate-400">
-                        Click para mayor información
-                      </div>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <div className="text-sm font-black text-slate-900">
-                        Bs. {lot.totalAmount}
-                      </div>
-
-                      <div
-                        className={`mt-1 text-xs font-black ${
-                          lot.status === "confirmed"
-                            ? "text-emerald-600"
-                            : "text-yellow-600"
-                        }`}
-                      >
-                        {lot.status.toUpperCase()}
-                      </div>
-
-                      {/* ✅ Flecha visual */}
-                      <div className="mt-3 text-slate-400 font-black">›</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </Modal>
-
-      <Modal
-        open={!!showLotDetail}
-        title="Detalle de compra"
-        onClose={() => setShowLotDetail(null)}
-        maxWidthClass="max-w-lg"
-      >
-        {showLotDetail && (
+        {/* TICKETS */}
+        <Modal
+          open={step === "TICKETS"}
+          title="Boletos"
+          onClose={resetAll}
+          maxWidthClass="max-w-xl"
+        >
           <div className="space-y-4">
-            <div className="rounded-xl bg-slate-50 p-4 text-sm font-bold">
-              <div className="flex justify-between">
-                <span>Cantidad</span>
-                <span>{showLotDetail.quantity}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total</span>
-                <span>Bs. {showLotDetail.totalAmount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Estado</span>
-                <span className="uppercase">{showLotDetail.status}</span>
-              </div>
+            <div className="mx-auto inline-flex rounded-full border border-yellow-200 bg-yellow-50 px-4 py-2 text-xs font-black text-yellow-900">
+              📅 {currentRaffle.date}
             </div>
 
-            <div className="text-xs font-black text-slate-500">Tus boletos</div>
+            <div className="text-center text-sm font-black text-slate-900">
+              {currentRaffle.title} 🔥
+            </div>
 
-            <div className="flex flex-wrap gap-2">
-              {showLotDetail.tickets.map((t) => (
+            <p className="text-center text-xs font-bold text-slate-500">
+              Estamos comprobando tu pago. En caso de ser aprobado tus boletos
+              serán activados.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              {generatedTickets.map((t) => (
                 <div
                   key={t}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-900"
@@ -721,487 +1210,10 @@ export default function RifasElManao() {
               ))}
             </div>
 
-            <PrimaryButton onClick={() => setShowLotDetail(null)}>
-              Volver
-            </PrimaryButton>
+            <PrimaryButton onClick={resetAll}>Ir al inicio</PrimaryButton>
           </div>
-        )}
-      </Modal>
-
-      {/* PAY */}
-      <Modal
-        open={step === "PAY"}
-        title="¿Cómo quieres pagar?"
-        onClose={() => setStep("NONE")}
-        maxWidthClass="max-w-xl"
-      >
-        <div className="space-y-6">
-          {/* Resumen (como la foto: limpio, con separadores) */}
-          <div className="space-y-3">
-            <div className="flex items-start justify-between text-sm">
-              <div className="text-slate-500 leading-tight">
-                Precio por <br /> boleto
-              </div>
-              <div className="font-semibold text-slate-900">
-                Bs. {currentRaffle.price.toFixed(2)}
-              </div>
-            </div>
-
-            <div className="flex items-start justify-between text-sm">
-              <div className="text-slate-500 leading-tight">
-                Cantidad de <br /> boletos
-              </div>
-              <div className="font-semibold text-slate-900">
-                {customQuantity}
-              </div>
-            </div>
-
-            <div className="border-t border-slate-200 pt-3 flex items-center justify-between text-sm">
-              <div className="text-slate-500">Total a pagar</div>
-              <div className="font-semibold text-slate-900">
-                Bs. {total.toFixed(2)}
-              </div>
-            </div>
-          </div>
-
-          {/* Título sección */}
-          <div className="text-sm font-black text-slate-900">
-            Elige el método de pago para continuar
-          </div>
-
-          {/* Métodos en L con más aire */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* PAGO MÓVIL (ACTIVO) */}
-            <button
-              type="button"
-              onClick={() => setSelectedPayment("pago-movil")}
-              className={`relative rounded-xl border p-5 text-left transition bg-white
-          ${
-            selectedPayment === "pago-movil"
-              ? "border-yellow-400"
-              : "border-slate-200 hover:border-yellow-400"
-          }`}
-            >
-              {/* radio arriba derecha */}
-              <span
-                className={`absolute right-4 top-4 h-4 w-4 rounded-full border-2
-            ${
-              selectedPayment === "pago-movil"
-                ? "border-yellow-400 bg-yellow-400"
-                : "border-yellow-400"
-            }`}
-              />
-
-              {/* icono simple como la foto */}
-              <div className="text-yellow-500 text-2xl leading-none">📱</div>
-
-              <div className="mt-3 text-sm font-black text-slate-900">
-                Pago móvil
-              </div>
-              <div className="mt-1 text-xs font-semibold text-slate-500">
-                Mínimo 5 boletos
-              </div>
-            </button>
-
-            {/* BINANCE PAY (INHABILITADO) */}
-            <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60">
-              <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
-
-              <div className="text-yellow-500 text-2xl leading-none">🔸</div>
-
-              <div className="mt-3 text-sm font-black text-slate-900">
-                Binance Pay
-              </div>
-              <div className="mt-1 text-xs font-semibold text-slate-500">
-                Mínimo 40 boletos
-              </div>
-            </div>
-
-            {/* ZELLE (INHABILITADO) abajo izquierda */}
-            <div className="relative rounded-xl border border-slate-200 bg-white p-5 opacity-60 col-span-1">
-              <span className="absolute right-4 top-4 h-4 w-4 rounded-full border-2 border-yellow-400" />
-
-              <div className="text-yellow-500 text-2xl leading-none">⚡</div>
-
-              <div className="mt-3 text-sm font-black text-slate-900">
-                Zelle
-              </div>
-              <div className="mt-1 text-xs font-semibold text-slate-500">
-                Mínimo 40 boletos
-              </div>
-            </div>
-          </div>
-
-          {/* T&C como la foto (texto, link) */}
-          <div className="pt-2 text-center text-xs font-semibold text-slate-600">
-            Al presionar "Continuar" declaras haber leído y aceptado nuestros{" "}
-            <a className="text-blue-600 font-black underline" href="#">
-              Términos y condiciones
-            </a>
-            .
-          </div>
-
-          {/* Botones abajo con aire */}
-          <div className="grid grid-cols-2 gap-4 pt-2">
-            <button
-              type="button"
-              className="h-12 rounded-xl border border-slate-200 bg-white text-sm font-black text-slate-900 hover:bg-slate-50 transition"
-              onClick={() => setStep("BUY")}
-            >
-              Cancelar
-            </button>
-
-            <button
-              type="button"
-              className={`h-12 rounded-xl text-sm font-black transition
-          ${
-            selectedPayment
-              ? "bg-yellow-400 text-slate-900 hover:bg-yellow-500"
-              : "bg-yellow-200 text-slate-500 cursor-not-allowed"
-          }`}
-              onClick={() => setStep("USER")}
-              disabled={!selectedPayment}
-            >
-              Continuar
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* USER */}
-      <Modal
-        open={step === "USER"}
-        title="Indica tus datos"
-        onClose={() => setStep("NONE")}
-        maxWidthClass="max-w-xl"
-      >
-        <div className="space-y-4">
-          <div>
-            <Label>Nombre completo</Label>
-            <Input
-              className="text-base"
-              value={userData.fullName}
-              onChange={(e: { target: { value: any } }) =>
-                setUserData({ ...userData, fullName: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <Label>Cédula</Label>
-            <div className="flex gap-2">
-              <Select
-                className="w-24"
-                value={userData.cedula}
-                onChange={(e: { target: { value: any } }) =>
-                  setUserData({ ...userData, cedula: e.target.value })
-                }
-              >
-                <option value="V">V</option>
-                <option value="E">E</option>
-                <option value="J">J</option>
-                <option value="G">G</option>
-              </Select>
-              <Input
-                className="text-base"
-                value={userData.cedulaNumber}
-                onChange={(e: { target: { value: any } }) =>
-                  setUserData({ ...userData, cedulaNumber: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label>Teléfono</Label>
-            <Input
-              className="text-base"
-              value={userData.phone}
-              onChange={(e: { target: { value: any } }) =>
-                setUserData({ ...userData, phone: e.target.value })
-              }
-            />
-          </div>
-
-          <div>
-            <Label>Correo comprador</Label>
-            <Input
-              className="text-base"
-              type="email"
-              value={userData.email}
-              onChange={(e: { target: { value: any } }) =>
-                setUserData({ ...userData, email: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <SecondaryButton full onClick={() => setStep("PAY")}>
-              Volver
-            </SecondaryButton>
-
-            <PrimaryButton
-              full
-              disabled={
-                loading ||
-                !userData.fullName ||
-                !userData.cedulaNumber ||
-                !userData.phone ||
-                !userData.email ||
-                !selectedPayment
-              }
-              onClick={() => {
-                setReportSecondsLeft(REPORT_TIME_SECONDS);
-                setStep("CONFIRM");
-              }}
-            >
-              {loading ? "Creando..." : "Pagar"}
-            </PrimaryButton>
-          </div>
-        </div>
-      </Modal>
-
-      {/* CONFIRM */}
-      <Modal
-        open={step === "CONFIRM"}
-        title="Realiza el pago"
-        onClose={() => setStep("NONE")}
-        maxWidthClass="max-w-xl"
-      >
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-slate-600">
-            Una vez realices el pago, reporta el comprobante.
-          </p>
-
-          <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-xs font-black text-yellow-900 inline-flex items-center gap-2">
-            ⏱️ Tiempo para reportar:
-            <span className="font-black">
-              {reportSecondsLeft !== null
-                ? formatTime(reportSecondsLeft)
-                : "10:00"}
-            </span>
-          </div>
-
-          <div className="rounded-xl bg-slate-50 p-4">
-            <div className="text-xs font-black text-slate-500 mb-2">
-              Monto exacto
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-black text-slate-900">
-                Bs. {total.toFixed(2)}
-              </div>
-              <button
-                className="h-10 w-10 rounded-xl bg-yellow-400 flex items-center justify-center hover:bg-yellow-500 transition"
-                onClick={() => copyWithFeedback("amount", total.toFixed(2))}
-                aria-label="Copiar monto"
-              >
-                <span
-                  className={`transition-all duration-200 ${
-                    copiedKey === "amount"
-                      ? "scale-110 opacity-100"
-                      : "scale-100 opacity-100"
-                  }`}
-                >
-                  {copiedKey === "amount" ? (
-                    <Check className="h-5 w-5 text-slate-900 animate-[pop_180ms_ease-out]" />
-                  ) : (
-                    <Copy className="h-5 w-5 text-slate-900" />
-                  )}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* datos banco (puedes hacerlos dinámicos por método luego) */}
-          <div className="space-y-2">
-            {[
-              { label: "Banco", value: "0102 (Banco de Venezuela)" },
-              { label: "Cédula", value: "J30471053" },
-              { label: "Teléfono", value: "04121897013" },
-            ].map((row) => (
-              <div
-                key={row.label}
-                className="flex items-center justify-between rounded-xl bg-slate-50 p-3"
-              >
-                <div className="text-xs font-black text-slate-500">
-                  {row.label}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-xs font-black text-slate-900">
-                    {row.value}
-                  </div>
-                  <button
-                    className="h-8 w-8 rounded-lg bg-slate-200 flex items-center justify-center hover:bg-slate-300 transition"
-                    onClick={() =>
-                      copyWithFeedback(`row-${row.label}`, row.value)
-                    }
-                    aria-label={`Copiar ${row.label}`}
-                  >
-                    {copiedKey === `row-${row.label}` ? (
-                      <Check className="h-4 w-4 text-slate-700 animate-[pop_180ms_ease-out]" />
-                    ) : (
-                      <Copy className="h-4 w-4 text-slate-700" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <PrimaryButton onClick={() => setStep("REPORT")}>
-            Reportar pago
-          </PrimaryButton>
-        </div>
-      </Modal>
-
-      {/* REPORT */}
-      <Modal
-        open={step === "REPORT"}
-        title="Detalla el pago que realizaste"
-        onClose={() => setStep("NONE")}
-        maxWidthClass="max-w-xl"
-      >
-        <div className="space-y-4">
-          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-xs font-bold text-yellow-900">
-            Tienes 10 minutos para reportar el pago o se cancela.
-          </div>
-
-          <div>
-            <Label>Número de referencia</Label>
-            <div className="flex gap-2">
-              <Input
-                className="text-base"
-                placeholder="Ej: 1234567890"
-                value={reportData.reference}
-                onChange={(e: { target: { value: any } }) =>
-                  setReportData({ ...reportData, reference: e.target.value })
-                }
-              />
-              <SecondaryButton
-                full={false}
-                className="min-w-[92px]"
-                onClick={async () => {
-                  const txt = await navigator.clipboard
-                    .readText()
-                    .catch(() => "");
-                  if (txt) setReportData((p) => ({ ...p, reference: txt }));
-                }}
-              >
-                Pegar
-              </SecondaryButton>
-            </div>
-          </div>
-
-          <div>
-            <Label>Teléfono emisor</Label>
-            <div className="flex gap-2">
-              <Select
-                className="w-28"
-                value={reportData.phonePrefix}
-                onChange={(e: { target: { value: any } }) =>
-                  setReportData({ ...reportData, phonePrefix: e.target.value })
-                }
-              >
-                {["0414", "0424", "0412", "0416", "0426"].map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
-
-              <Input
-                className="text-base"
-                placeholder="Ej: 1234567"
-                value={reportData.phone}
-                onChange={(e: { target: { value: string } }) =>
-                  setReportData({
-                    ...reportData,
-                    phone: e.target.value.replace(/\D/g, ""),
-                  })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <div className="text-sm font-black text-slate-900">
-              Cargar comprobante
-            </div>
-            <div className="mt-1 text-xs font-bold text-slate-500">
-              PNG, JPG hasta 2MB
-            </div>
-
-            <label className="mt-3 block cursor-pointer">
-              <div className="rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 px-4 py-3 text-center text-xs font-black text-slate-900 shadow-lg shadow-yellow-500/25 hover:-translate-y-[1px] transition">
-                Subir imagen
-              </div>
-              <input
-                type="file"
-                accept="image/png,image/jpeg"
-                className="hidden"
-                onChange={(e) =>
-                  setReportData({
-                    ...reportData,
-                    proofFile: e.target.files?.[0] ?? null,
-                  })
-                }
-              />
-            </label>
-
-            {reportData.proofFile && (
-              <div className="mt-3 text-xs font-black text-emerald-600">
-                ✅ {reportData.proofFile.name}
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <SecondaryButton full onClick={() => setStep("CONFIRM")}>
-              Volver
-            </SecondaryButton>
-
-            <PrimaryButton full onClick={reportPayment} disabled={loading}>
-              {loading ? "Enviando..." : "Confirmar compra"}
-            </PrimaryButton>
-          </div>
-        </div>
-      </Modal>
-
-      {/* TICKETS */}
-      <Modal
-        open={step === "TICKETS"}
-        title="Boletos"
-        onClose={resetAll}
-        maxWidthClass="max-w-xl"
-      >
-        <div className="space-y-4">
-          <div className="mx-auto inline-flex rounded-full border border-yellow-200 bg-yellow-50 px-4 py-2 text-xs font-black text-yellow-900">
-            📅 {currentRaffle.date}
-          </div>
-
-          <div className="text-center text-sm font-black text-slate-900">
-            {currentRaffle.title} 🔥
-          </div>
-
-          <p className="text-center text-xs font-bold text-slate-500">
-            Estamos comprobando tu pago. En caso de ser aprobado tus boletos
-            serán activados.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-2">
-            {generatedTickets.map((t) => (
-              <div
-                key={t}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-900"
-              >
-                {t}
-              </div>
-            ))}
-          </div>
-
-          <PrimaryButton onClick={resetAll}>Ir al inicio</PrimaryButton>
-        </div>
-      </Modal>
-    </div>
+        </Modal>
+      </div>{" "}
+    </>
   );
 }
