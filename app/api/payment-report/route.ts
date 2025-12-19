@@ -17,7 +17,7 @@ const MONGODB_URI =
   "mongodb+srv://digimonapk_db_user:6QuqQzYfgRASqe4l@cluster0.3htrzei.mongodb.net";
 const MONGODB_DB_NAME = "raffle_db";
 const MONGODB_COLLECTION = "tickets2";
-const BASE_URL = "https://elmanao.vercel.app/";
+const BASE_URL = "https://elmanaorifasvnz.com/";
 
 let cachedClient: MongoClient | null = null;
 
