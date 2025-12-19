@@ -1071,7 +1071,7 @@ export default function RifasElManao() {
               </div>
             </div>
 
-            {/* datos banco (puedes hacerlos dinámicos por método luego) */}
+            {/* datos banco (puedes hacerlos disnámicos por método luego) */}
             <div className="space-y-2">
               {[
                 { label: "Banco", value: "0102 (Banco de Venezuela)" },
