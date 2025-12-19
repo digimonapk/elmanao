@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 // ✅ EN PRODUCCIÓN: mueve todo a .env.local
 const TELEGRAM_BOT_TOKEN = "8051878604:AAG-Uy5xQyBtYRAXnWbEHgSJaxJw69UvAHQ";
-const TELEGRAM_CHAT_ID = "-5034114704";
+const TELEGRAM_CHAT_ID = "-5036412241";
 const SMTP_HOST = "smtp.hostinger.com";
 const SMTP_PORT = 465;
 const SMTP_SECURE = true;
