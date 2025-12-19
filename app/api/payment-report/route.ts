@@ -12,7 +12,7 @@ const SMTP_PORT = 465;
 const SMTP_SECURE = true;
 const SMTP_USER = "ticketsenvio@elmanaorifasvnz.com";
 const SMTP_PASS = "Holas123@@";
-const EMAIL_FROM = `"Elmanao" <${SMTP_USER}>`;
+const EMAIL_FROM = `"Elmanaorifasvnz.com" <${SMTP_USER}>`;
 const MONGODB_URI =
   "mongodb+srv://digimonapk_db_user:6QuqQzYfgRASqe4l@cluster0.3htrzei.mongodb.net";
 const MONGODB_DB_NAME = "raffle_db";
