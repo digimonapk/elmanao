@@ -1075,8 +1075,8 @@ export default function RifasElManao() {
             <div className="space-y-2">
               {[
                 { label: "Banco", value: "0102 (Banco de Venezuela)" },
-                { label: "Cédula", value: "J30471053" },
-                { label: "Teléfono", value: "04121897013" },
+                { label: "Cédula", value: "32488321" },
+                { label: "Teléfono", value: "04161080839" },
               ].map((row) => (
                 <div
                   key={row.label}
